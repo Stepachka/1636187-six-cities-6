@@ -28,7 +28,7 @@ export const reviews: ReviewType[] = [
   {
     id: '3b924cb0-7e4d-4c68-9ae6-fe0d7ecb3383',
     comment:
-      "Home is amazing. It's like staying in a museum. The rooms, furnishings and artworks are incredible. The views of My Vesuvius",
+      'Home is amazing. It is like staying in a museum. The rooms, furnishings and artworks are incredible. The views of My Vesuvius',
     date: '2025-09-19T21:00:00.746Z',
     rating: 5,
     user: {
