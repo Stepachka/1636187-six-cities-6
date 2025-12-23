@@ -2,7 +2,7 @@ import { useState, Fragment, ChangeEvent, FormEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatchType } from '../../store';
 
-import { sendReview, fetchReviewsByOfferId } from '../../store/reviews/action';
+import { sendReview } from '../../store/reviews/action';
 import { selectIsSendingReview } from '../../store/reviews/selectors';
 import { RATINGS } from './const';
 
@@ -19,9 +19,7 @@ function OfferPageForm({ offerId }: OfferPageFormProps) {
     review: '',
   });
 
-  const handleFieldChange = (
-    evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleFieldChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = evt.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -29,24 +27,20 @@ function OfferPageForm({ offerId }: OfferPageFormProps) {
   const handleSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
 
-    if (
-      !formData.rating ||
-      formData.review.length < 50 ||
-      formData.review.length > 300
-    ) {
+    if (!formData.rating || formData.review.length < 50 || formData.review.length > 300) {
       return;
     }
 
-    await dispatch(
-      sendReview({
+    try {
+      await dispatch(sendReview({
         offerId,
         rating: Number(formData.rating),
         comment: formData.review,
-      })
-    ).unwrap();
-
-    setFormData({ rating: '', review: '' });
-    dispatch(fetchReviewsByOfferId(offerId));
+      })).unwrap();
+      setFormData({ rating: '', review: '' });
+    } catch (_err) {
+      void 0;
+    }
   };
 
   const isSubmitDisabled =
@@ -62,9 +56,7 @@ function OfferPageForm({ offerId }: OfferPageFormProps) {
         void handleSubmit(e);
       }}
     >
-      <label className="reviews__label form__label" htmlFor="review">
-        Your review
-      </label>
+      <label className="reviews__label form__label" htmlFor="review">Your review</label>
       <div className="reviews__rating-form form__rating">
         {RATINGS.map((star) => (
           <Fragment key={star.value}>
@@ -101,17 +93,9 @@ function OfferPageForm({ offerId }: OfferPageFormProps) {
       />
       <div className="reviews__button-wrapper">
         <p className="reviews__help">
-          To submit review please make sure to set{' '}
-          <span className="reviews__star">rating</span> and describe your stay
-          with at least <b className="reviews__text-amount">50 characters</b>.
+          To submit review please make sure to set <span className="reviews__star">rating</span> and describe your stay with at least <b className="reviews__text-amount">50 characters</b>.
         </p>
-        <button
-          className="reviews__submit form__submit button"
-          type="submit"
-          disabled={isSubmitDisabled}
-        >
-          Submit
-        </button>
+        <button className="reviews__submit form__submit button" type="submit" disabled={isSubmitDisabled}>Submit</button>
       </div>
     </form>
   );

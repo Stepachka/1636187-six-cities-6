@@ -5,7 +5,7 @@ import Header from '../../components/header/header';
 import Footer from '../../components/footer/footer';
 
 import styles from './page-404.module.css';
-import gif404 from './404.png';
+import gif404 from './404_2.gif';
 
 function Page404() {
   return (
