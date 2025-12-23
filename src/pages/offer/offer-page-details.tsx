@@ -98,7 +98,7 @@ function OfferPageDetails({ offer, reviews }: OfferPageDetailsProps) {
           </div>
           <section className="offer__reviews reviews">
             <OfferPageReviews reviews={reviews} />
-            <OfferPageForm />
+            <OfferPageForm reviews={[]} />
           </section>
         </div>
       </div>
