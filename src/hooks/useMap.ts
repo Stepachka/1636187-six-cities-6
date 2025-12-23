@@ -1,23 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import leaflet from 'leaflet';
-import { OfferPreviewType } from '../types/offer-preview';
+import { LocationType } from '../types/location';
 
-function useMap(
-  mapRef: React.RefObject<HTMLDivElement>,
-  offers: OfferPreviewType[]
-) {
+function useMap(mapRef: React.RefObject<HTMLDivElement>, point: LocationType) {
   const [map, setMap] = useState<L.Map | null>(null);
   const isRenderedRef = useRef(false);
-  const city = offers[0].city;
 
   useEffect(() => {
     if (mapRef.current !== null && !isRenderedRef.current) {
       const instance = leaflet.map(mapRef.current, {
         center: {
-          lat: city.location.latitude,
-          lng: city.location.longitude,
+          lat: point.latitude,
+          lng: point.longitude,
         },
-        zoom: city.location.zoom,
+        zoom: point.zoom,
       });
 
       leaflet
@@ -33,7 +29,7 @@ function useMap(
       setMap(instance);
       isRenderedRef.current = true;
     }
-  }, [mapRef, city]);
+  }, [mapRef, point]);
 
   return map;
 }

@@ -1,15 +1,22 @@
 import { OfferType } from '../../types/offer';
+import { OfferPreviewType } from '../../types/offer-preview';
 import { ReviewType } from '../../types/review';
 import { capitalize } from '../../utils/scripts';
 import OfferPageForm from './offer-page-form';
-import OfferPageReviews from './offer-page-reviews';
+import Map from '../../components/map/map';
+import OfferPageReviewsList from './offer-page-reviews-list';
 
 type OfferPageDetailsProps = {
   offer: OfferType;
+  offersNearby: OfferPreviewType[];
   reviews: ReviewType[];
 };
 
-function OfferPageDetails({ offer, reviews }: OfferPageDetailsProps) {
+function OfferPageDetails({
+  offer,
+  offersNearby,
+  reviews,
+}: OfferPageDetailsProps) {
   return (
     <section className="offer">
       <div className="offer__gallery-container container">
@@ -97,12 +104,12 @@ function OfferPageDetails({ offer, reviews }: OfferPageDetailsProps) {
             </div>
           </div>
           <section className="offer__reviews reviews">
-            <OfferPageReviews reviews={reviews} />
+            <OfferPageReviewsList reviews={reviews} />
             <OfferPageForm reviews={[]} />
           </section>
         </div>
       </div>
-      <section className="offer__map map"></section>
+      <Map currentOffer={offer} offers={offersNearby} block="offer__map" />
     </section>
   );
 }
