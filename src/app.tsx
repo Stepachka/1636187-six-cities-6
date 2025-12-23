@@ -8,32 +8,33 @@ import { OfferType } from './types/offer';
 import { ReviewType } from './types/review';
 import FavoritesPage from './pages/favorites/favorites-page';
 import OfferPage from './pages/offer/offer-page';
+import { OfferPreviewType } from './types/offer-preview';
 
-type TAppProps = {
-  offers: OfferType[];
-  reviews: ReviewType[];
+
+export const App = () => {
+  const offers: OfferPreviewType[] = [];
+  const offerId: OfferType[] = [];
+  const reviews: ReviewType[] = [];
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path={AppRoute.Main} element={<MainPage />} />
+        <Route path={AppRoute.Login} element={<LoginPage />} />
+        <Route
+          path={AppRoute.Favorites}
+          element={
+            <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
+              <FavoritesPage offers={offers} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={`${AppRoute.Offer}/:id`}
+          element={<OfferPage offers={offerId} offersNearby={offers} reviews={reviews}/>}
+        />
+        <Route path={AppRoute.Page404} element={<Page404 />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
-
-export const App = ({ offers, reviews }: TAppProps) => (
-  <BrowserRouter>
-    <Routes>
-      <Route path={AppRoute.Main} element={<MainPage offers={offers} />} />
-      <Route path={AppRoute.Login} element={<LoginPage />} />
-      <Route
-        path={AppRoute.Favorites}
-        element={
-          <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
-            <FavoritesPage offers={offers} />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path={`${AppRoute.Offer}/:id`}
-        element={
-          <OfferPage offers={offers} offersNearby={offers} reviews={reviews} />
-        }
-      />
-      <Route path={AppRoute.Page404} element={<Page404 />} />
-    </Routes>
-  </BrowserRouter>
-);
