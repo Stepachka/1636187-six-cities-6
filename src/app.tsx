@@ -9,16 +9,12 @@ import LoginPage from './pages/login/login-page';
 import MainPage from './pages/main/main-page';
 import OfferPage from './pages/offer/offer-page';
 import { AppDispatchType } from './store';
-import { OfferType } from './types/offer';
 import { OfferPreviewType } from './types/offer-preview';
-import { ReviewType } from './types/review';
 import Page404 from './pages/page-404/page-404';
 import { fetchCheckAuth } from './store/user/action';
 
 function App() {
   const offers: OfferPreviewType[] = [];
-  const offerId: OfferType[] = [];
-  const reviews: ReviewType[] = [];
   const dispatch = useDispatch<AppDispatchType>();
 
   useEffect(() => {
@@ -46,7 +42,7 @@ function App() {
         />
         <Route
           path={`${AppRoute.Offer}/:id`}
-          element={<OfferPage offers={offerId} offersNearby={offers} reviews={reviews}/>}
+          element={<OfferPage />}
         />
         <Route
           path={AppRoute.Page404}
