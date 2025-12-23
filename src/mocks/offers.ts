@@ -20,14 +20,14 @@ export const offers: OfferType[] = [
     city: {
       name: 'Amsterdam',
       location: {
-        latitude: 48.85661,
-        longitude: 2.351499,
-        zoom: 13,
+        latitude: 52.37454,
+        longitude: 4.897976,
+        zoom: 12,
       },
     },
     location: {
-      latitude: 48.86861,
-      longitude: 2.342499,
+      latitude: 52.3909553943508,
+      longitude: 4.85309666406198,
       zoom: 16,
     },
     goods: [
@@ -75,14 +75,14 @@ export const offers: OfferType[] = [
     city: {
       name: 'Paris',
       location: {
-        latitude: 48.85661,
-        longitude: 2.351499,
-        zoom: 13,
+        latitude: 52.37454,
+        longitude: 4.897976,
+        zoom: 12,
       },
     },
     location: {
-      latitude: 48.85861,
-      longitude: 2.330499,
+      latitude: 52.3609553943508,
+      longitude: 4.85309666406198,
       zoom: 16,
     },
     goods: [
@@ -131,14 +131,14 @@ export const offers: OfferType[] = [
     city: {
       name: 'Cologne',
       location: {
-        latitude: 48.85661,
-        longitude: 2.351499,
-        zoom: 13,
+        latitude: 52.37454,
+        longitude: 4.897976,
+        zoom: 12,
       },
     },
     location: {
-      latitude: 48.83461,
-      longitude: 2.335499,
+      latitude: 52.3909553943508,
+      longitude: 4.929309666406198,
       zoom: 16,
     },
     goods: [
@@ -184,14 +184,14 @@ export const offers: OfferType[] = [
     city: {
       name: 'Paris',
       location: {
-        latitude: 48.85661,
-        longitude: 2.351499,
-        zoom: 13,
+        latitude: 52.37454,
+        longitude: 4.897976,
+        zoom: 12,
       },
     },
     location: {
-      latitude: 48.85761,
-      longitude: 2.358499,
+      latitude: 52.3809553943508,
+      longitude: 4.939309666406198,
       zoom: 16,
     },
     goods: ['Air conditioning', 'Fridge', 'Washer'],

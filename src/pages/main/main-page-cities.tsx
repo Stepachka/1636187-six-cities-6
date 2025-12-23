@@ -1,15 +1,18 @@
+import MainPageCard from './main-page-card';
 import { OfferPreviewType } from '../../types/offer-preview';
 import { useState } from 'react';
-import MainPageCard from './main-page-card';
+import Map from '../../components/map/map';
 
 type MainPageCitiesProps = {
   offers: OfferPreviewType[];
 };
 
 function MainPageCities({ offers }: MainPageCitiesProps) {
-  const [, setHoveredCardId] = useState<OfferPreviewType['id'] | null>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<
+    OfferPreviewType['id'] | null
+  >(null);
 
-  function hoverCard(id: OfferPreviewType['id'] | null) {
+  function handleCardHover(id: OfferPreviewType['id'] | null) {
     setHoveredCardId(id);
   }
 
@@ -52,13 +55,13 @@ function MainPageCities({ offers }: MainPageCitiesProps) {
               <MainPageCard
                 key={offer.id}
                 offer={offer}
-                onMouseHover={hoverCard}
+                onMouseHover={handleCardHover}
               />
             ))}
           </div>
         </section>
         <div className="cities__right-section">
-          <section className="cities__map map"></section>
+          <Map offers={offers} selectedOfferId={hoveredCardId} />
         </div>
       </div>
     </div>
