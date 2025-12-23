@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppRoute, AuthorizationStatus } from './const';
 import LoginPage from './pages/login/login.page';
-import MainPage from './pages/main/main.page';
+import MainPage from './pages/main/main-page';
 import { Page404 } from './pages/page-404/page-404.page';
 import PrivateRoute from './components/private-route/private-route.component';
 import { OfferType } from './types/offer';
