@@ -3,6 +3,7 @@ import { ReviewType } from '../../types/review';
 import { AxiosInstance, AxiosError } from 'axios';
 import { setServerError } from '../error/action';
 import { SendReviewType } from '../../types/send-review';
+import { tokenService } from '../../services/token';
 
 export const fetchReviewsByOfferId = createAsyncThunk<
   ReviewType[],
@@ -12,19 +13,13 @@ export const fetchReviewsByOfferId = createAsyncThunk<
   'reviews/fetchReviewsByOfferId',
   async (offerId, { dispatch, extra: api }) => {
     try {
-      const token = localStorage.getItem('six-cities-token');
-      const headers: Record<string, string> = {};
-
-      if (token) {
-        headers['X-Token'] = token;
-      }
-
-      const { data } = await api.get<ReviewType[]>(
-        `/comments/${offerId}`,
-        { headers }
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { data } = await api.get(`/comments/${offerId}`, {
+        headers: tokenService.getAuthHeaders(),
+      });
 
       dispatch(setServerError(null));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return data;
     } catch (err) {
       const error = err as AxiosError;
@@ -46,17 +41,10 @@ export const sendReview = createAsyncThunk<
   'reviews/sendReview',
   async ({ offerId, rating, comment }, { dispatch, extra: api }) => {
     try {
-      const token = localStorage.getItem('six-cities-token');
-      const headers: Record<string, string> = {};
-
-      if (token) {
-        headers['X-Token'] = token;
-      }
-
       const { data } = await api.post<ReviewType[]>(
         `/comments/${offerId}`,
         { comment, rating },
-        { headers }
+        { headers: tokenService.getAuthHeaders() }
       );
 
       dispatch(setServerError(null));
