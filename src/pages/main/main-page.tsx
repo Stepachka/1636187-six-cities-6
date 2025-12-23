@@ -1,20 +1,33 @@
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import Header from '../../components/header/header';
+import Spinner from '../../components/spinner/spinner';
+
+import { AppDispatchType } from '../../store';
+import { fetchOffers } from '../../store/offers/action';
+import {
+  selectOffersByCity,
+  selectIsOffersLoading,
+} from '../../store/offers/selectors';
+
 import MainPageCitiesList from './main-page-cities-list';
 import MainPageCities from './main-page-cities';
-import Header from '../../components/header/header';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchOffers } from '../../store/offers/action';
-import { useEffect } from 'react';
 import MainPageEmpty from './main-page-empty';
-import Spinner from '../../components/spinner/spinner';
-import { AppDispatchType } from '../../store';
-import { selectOffersByCity, selectIsOffersLoading } from '../../store/offers/selectors';
-
 
 function MainPage() {
   const dispatch = useDispatch<AppDispatchType>();
 
   useEffect(() => {
-    dispatch(fetchOffers());
+    let isMounted = true;
+
+    if (isMounted) {
+      dispatch(fetchOffers());
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [dispatch]);
 
   const filteredOffers = useSelector(selectOffersByCity);
@@ -34,10 +47,14 @@ function MainPage() {
 
   return (
     <div className="page page--gray page--main ">
-      <Header/>
+      <Header />
 
-      <main className={`page__main page__main--index ${hasOffers ? '' : 'page__main--index-empty'}`}>
-        <MainPageCitiesList/>
+      <main
+        className={`page__main page__main--index ${
+          hasOffers ? '' : 'page__main--index-empty'
+        }`}
+      >
+        <MainPageCitiesList />
         {content}
       </main>
     </div>

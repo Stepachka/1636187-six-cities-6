@@ -1,19 +1,42 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { AppDispatchType } from '../../store';
+import { AppRoute } from '../../const';
+
 import { OfferType } from '../../types/offer';
 import { OfferPreviewType } from '../../types/offer-preview';
+
 import { capitalize, getRating, plural } from '../../utils/scripts';
+
+import Map from '../../components/map/map';
 import OfferPageReviewsList from './offer-page-reviews-list';
 import OfferPageForm from './offer-page-form';
-import Map from '../../components/map/map';
-import { useSelector } from 'react-redux';
 import { selectIsAuth } from '../../store/user/selectors';
+import { changeFavoriteStatus } from '../../store/favorite/action';
 
 type OfferPageDetailsProps = {
   offer: OfferType;
   offersNearby: OfferPreviewType[];
-}
+};
 
-function OfferPageDetails({offer, offersNearby}: OfferPageDetailsProps) {
+function OfferPageDetails({ offer, offersNearby }: OfferPageDetailsProps) {
   const isAuth = useSelector(selectIsAuth);
+  const dispatch = useDispatch<AppDispatchType>();
+  const navigate = useNavigate();
+
+  const handleFavoriteClick = () => {
+    if (!isAuth) {
+      navigate(AppRoute.Login);
+      return;
+    }
+
+    dispatch(
+      changeFavoriteStatus({
+        offerId: offer.id,
+        status: offer.isFavorite ? 0 : 1,
+      })
+    );
+  };
 
   return (
     <section className="offer">
@@ -34,14 +57,20 @@ function OfferPageDetails({offer, offersNearby}: OfferPageDetailsProps) {
             </div>
           )}
           <div className="offer__name-wrapper">
-            <h1 className="offer__name">
-              {offer.title}
-            </h1>
-            <button className="offer__bookmark-button button" type="button">
+            <h1 className="offer__name">{offer.title}</h1>
+            <button
+              className={`offer__bookmark-button button ${
+                offer.isFavorite ? 'offer__bookmark-button--active' : ''
+              }`}
+              type="button"
+              onClick={handleFavoriteClick}
+            >
               <svg className="offer__bookmark-icon" width="31" height="33">
                 <use xlinkHref="#icon-bookmark"></use>
               </svg>
-              <span className="visually-hidden">To bookmarks</span>
+              <span className="visually-hidden">
+                {offer.isFavorite ? 'In bookmarks' : 'To bookmarks'}
+              </span>
             </button>
           </div>
           <div className="offer__rating rating">
@@ -49,7 +78,9 @@ function OfferPageDetails({offer, offersNearby}: OfferPageDetailsProps) {
               <span style={{ width: getRating(offer.rating) }}></span>
               <span className="visually-hidden">Rating</span>
             </div>
-            <span className="offer__rating-value rating__value">{offer.rating}</span>
+            <span className="offer__rating-value rating__value">
+              {offer.rating}
+            </span>
           </div>
           <ul className="offer__features">
             <li className="offer__feature offer__feature--entire">
@@ -79,31 +110,35 @@ function OfferPageDetails({offer, offersNearby}: OfferPageDetailsProps) {
           <div className="offer__host">
             <h2 className="offer__host-title">Meet the host</h2>
             <div className="offer__host-user user">
-              <div className={`offer__avatar-wrapper ${offer.host.isPro ? 'offer__avatar-wrapper--pro' : ''} user__avatar-wrapper`}>
-                <img className="offer__avatar user__avatar" src={offer.host.avatarUrl} width="74" height="74" alt="Host avatar"/>
+              <div
+                className={`offer__avatar-wrapper ${
+                  offer.host.isPro ? 'offer__avatar-wrapper--pro' : ''
+                } user__avatar-wrapper`}
+              >
+                <img
+                  className="offer__avatar user__avatar"
+                  src={offer.host.avatarUrl}
+                  width="74"
+                  height="74"
+                  alt="Host avatar"
+                />
               </div>
-              <span className="offer__user-name">
-                {offer.host.name}
-              </span>
+              <span className="offer__user-name">{offer.host.name}</span>
               {offer.host.isPro && (
-                <span className="offer__user-status">
-                  Pro
-                </span>
+                <span className="offer__user-status">Pro</span>
               )}
             </div>
             <div className="offer__description">
-              <p className="offer__text">
-                {offer.description}
-              </p>
+              <p className="offer__text">{offer.description}</p>
             </div>
           </div>
           <section className="offer__reviews reviews">
-            <OfferPageReviewsList/>
-            {isAuth && <OfferPageForm offerId={offer.id}/>}
+            <OfferPageReviewsList />
+            {isAuth && <OfferPageForm offerId={offer.id} />}
           </section>
         </div>
       </div>
-      <Map currentOffer={offer} offers={offersNearby} block='offer__map' />
+      <Map currentOffer={offer} offers={offersNearby} block="offer__map" />
     </section>
   );
 }

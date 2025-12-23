@@ -1,8 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ReviewType } from '../../types/review';
 import { AxiosInstance, AxiosError } from 'axios';
-import { setServerError } from '../error/action';
+
+import { ReviewType } from '../../types/review';
 import { SendReviewType } from '../../types/send-review';
+import { setServerError } from '../error/action';
 import { tokenService } from '../../services/token';
 
 export const fetchReviewsByOfferId = createAsyncThunk<
@@ -13,13 +14,11 @@ export const fetchReviewsByOfferId = createAsyncThunk<
   'reviews/fetchReviewsByOfferId',
   async (offerId, { dispatch, extra: api }) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const { data } = await api.get(`/comments/${offerId}`, {
+      const { data } = await api.get<ReviewType[]>(`/comments/${offerId}`, {
         headers: tokenService.getAuthHeaders(),
       });
 
       dispatch(setServerError(null));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return data;
     } catch (err) {
       const error = err as AxiosError;
