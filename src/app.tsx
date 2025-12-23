@@ -29,7 +29,9 @@ export const App = ({ offers, reviews }: TAppProps) => (
       />
       <Route
         path={`${AppRoute.Offer}/:id`}
-        element={<OfferPage offers={offers} reviews={reviews} />}
+        element={
+          <OfferPage offers={offers} offersNearby={offers} reviews={reviews} />
+        }
       />
       <Route path={AppRoute.Page404} element={<Page404 />} />
     </Routes>
