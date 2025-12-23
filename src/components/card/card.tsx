@@ -1,16 +1,16 @@
 import { OfferPreviewType } from '../../types/offer-preview';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../const';
-import { capitalize } from '../../utils/scripts';
+import { capitalize, getRating } from '../../utils/scripts';
 
 type CardProps = {
   offer: OfferPreviewType;
   block: string;
   onMouseHover?: (id: OfferPreviewType['id'] | null) => void;
-};
+}
 
-function Card({ offer, block, onMouseHover }: CardProps) {
-  const { isPremium, id, previewImage, title, price, rating, type } = offer;
+function Card({offer, block, onMouseHover}: CardProps) {
+  const {isPremium, id, previewImage, title, price, rating, type} = offer;
 
   function mouseEnter() {
     onMouseHover?.(id);
@@ -21,6 +21,7 @@ function Card({ offer, block, onMouseHover }: CardProps) {
   }
 
   return (
+
     <article
       className={`${block}__card place-card`}
       {...(onMouseHover
@@ -37,13 +38,7 @@ function Card({ offer, block, onMouseHover }: CardProps) {
       )}
       <div className={`${block}__image-wrapper place-card__image-wrapper`}>
         <Link to={`${AppRoute.Offer}/${id}`}>
-          <img
-            className="place-card__image"
-            src={previewImage}
-            width="260"
-            height="200"
-            alt={title}
-          />
+          <img className="place-card__image" src={previewImage} width="260" height="200" alt={title}/>
         </Link>
       </div>
       <div className="place-card__info">
@@ -61,7 +56,7 @@ function Card({ offer, block, onMouseHover }: CardProps) {
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span style={{ width: `${rating * 20}%` }}></span>
+            <span style={{ width: getRating(rating) }}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>
