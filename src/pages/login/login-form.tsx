@@ -3,29 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchLogin } from '../../store/user/action';
 import { setServerError } from '../../store/error/action';
-import { AppDispatchType, RootState } from '../../store';
+import { AppDispatchType } from '../../store';
+import { selectServerError } from '../../store/error/selectors';
 
 function LoginForm() {
   const dispatch = useDispatch<AppDispatchType>();
-  const serverError = useSelector(
-    (state: RootState) => state.error.serverError
-  );
+  const serverError = useSelector(selectServerError);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const validatePassword = (pwd: string) =>
-    /[A-Za-z]/.test(pwd) && /\d/.test(pwd);
+  const validatePassword = (pwd: string) => /[A-Za-z]/.test(pwd) && /\d/.test(pwd);
 
   const handleSubmit = (evt: FormEvent) => {
     evt.preventDefault();
 
     if (!validatePassword(password)) {
-      dispatch(
-        setServerError(
-          'Пароль должен содержать минимум одну английскую букву и одну цифру'
-        )
-      );
+      dispatch(setServerError('Пароль должен содержать минимум одну английскую букву и одну цифру'));
       return;
     }
 

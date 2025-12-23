@@ -5,11 +5,7 @@ import Footer from '../../components/footer/footer';
 import Spinner from '../../components/spinner/spinner';
 import FavoritesPageEmpty from './favorites-page-empty';
 import FavoritesPageList from './favorites-page-list';
-import {
-  selectIsFavorites,
-  selectGroupedFavorites,
-  selectFavoritesLoadingStatus,
-} from '../../store/favorite/selector';
+import { selectIsFavorites, selectGroupedFavorites, selectFavoritesLoadingStatus } from '../../store/favorite/selector';
 
 function FavoritesPage() {
   const hasOffers = useSelector(selectIsFavorites);
@@ -17,28 +13,20 @@ function FavoritesPage() {
   const isLoading = useSelector(selectFavoritesLoadingStatus);
 
   return (
-    <div className="page">
-      <Header />
+    <div className={`page ${!hasOffers && 'page--favorites-empty'}`}>
+      <Header/>
 
       {isLoading ? (
-        <Spinner />
+        <Spinner/>
       ) : (
-        <main
-          className={`page__main page__main--favorites ${
-            hasOffers ? 'page__main--favorites-empty' : ''
-          }`}
-        >
+        <main className={`page__main page__main--favorites ${!hasOffers && 'page__main--favorites-empty'}`}>
           <div className="page__favorites-container container">
-            {hasOffers ? (
-              <FavoritesPageList offers={groupCitiesOffer} />
-            ) : (
-              <FavoritesPageEmpty />
-            )}
+            {hasOffers ? <FavoritesPageList offers={groupCitiesOffer}/> : <FavoritesPageEmpty/>}
           </div>
         </main>
       )}
 
-      <Footer />
+      <Footer/>
     </div>
   );
 }
