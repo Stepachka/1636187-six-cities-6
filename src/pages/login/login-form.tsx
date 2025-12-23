@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatchType } from '../../store';
 import { fetchLogin } from '../../store/user/action';
+import { AppDispatchType } from '../../store';
 
 function LoginForm() {
   const dispatch: AppDispatchType = useDispatch();
