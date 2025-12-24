@@ -1,10 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import type { TypedUseSelectorHook } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
+
 import LoginPage from '../login-page';
 import { AppRoute, City } from '../../../const';
 import { setCity } from '../../../store/offers/action';
-import type { TypedUseSelectorHook } from 'react-redux';
 
 const mockDispatch = vi.fn();
 let selectorReturnValues: unknown[] = [];

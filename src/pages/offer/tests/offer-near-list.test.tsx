@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+
 import OfferNearList from '../offer-near-list';
 import { OfferPreviewType } from '../../../types/offer-preview';
 

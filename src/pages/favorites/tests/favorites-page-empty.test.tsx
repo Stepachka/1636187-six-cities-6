@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+
 import FavoritesPageEmpty from '../favorites-page-empty';
 
 describe('FavoritesPageEmpty component', () => {

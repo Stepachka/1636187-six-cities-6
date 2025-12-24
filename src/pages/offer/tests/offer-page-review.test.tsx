@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+
 import OfferPageReview from '../offer-page-review';
 import { ReviewType } from '../../../types/review';
 

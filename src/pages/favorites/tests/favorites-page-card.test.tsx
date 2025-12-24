@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FavoritesPageCard from '../favorites-page-card';
 import { AppRoute } from '../../../const';

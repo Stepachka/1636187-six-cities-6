@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+
 import OfferPageDetails from '../offer-page-details';
 import { AppRoute } from '../../../const';
 import { OfferType } from '../../../types/offer';
