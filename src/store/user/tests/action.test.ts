@@ -57,7 +57,7 @@ describe('user async thunks', () => {
 
   it('fetchLogin dispatches Auth on success', async () => {
     const loginData: LoginData = { email: 'test@example.com', password: '123' };
-    mockApi.onPost('/login').reply(200, mockUser);
+    mockApi.onPost('/login').reply(201, mockUser);
 
     await fetchLogin(loginData)(dispatch, getState, axios);
 
