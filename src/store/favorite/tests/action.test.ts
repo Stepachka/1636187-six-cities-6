@@ -1,63 +1,70 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AxiosInstance, AxiosError } from 'axios';
-import { tokenService } from '../../../services/token';
-import { OfferPreviewType } from '../../../types/offer-preview';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { fetchFavorites, changeFavoriteStatus } from '../action';
 import { setServerError } from '../../error/action';
+import { OfferPreviewType } from '../../../types/offer-preview';
 
+const mockApi = new MockAdapter(axios);
 
-export const fetchFavorites = createAsyncThunk<
-  OfferPreviewType[],
-  undefined,
-  { extra: AxiosInstance }
->(
-  'favorite/fetchFavorites',
-  async (_arg, { dispatch, extra: api }) => {
-    try {
-      const { data } = await api.get<OfferPreviewType[]>(
-        '/favorite',
-        { headers: tokenService.getAuthHeaders() }
+const dispatch = vi.fn();
+
+const mockFavorite: OfferPreviewType = {
+  id: '1',
+  isFavorite: true,
+  city: { name: 'Paris' },
+} as OfferPreviewType;
+
+describe('favorite async actions', () => {
+  afterEach(() => {
+    mockApi.reset();
+    dispatch.mockClear();
+  });
+
+  describe('fetchFavorites', () => {
+    it('should return favorites on success', async () => {
+      mockApi.onGet('/favorite').reply(200, [mockFavorite]);
+
+      const thunk = fetchFavorites();
+      const result = await thunk(dispatch, () => ({}), axios);
+
+      expect(result.payload).toEqual([mockFavorite]);
+      expect(dispatch).toHaveBeenCalledWith(setServerError(null));
+    });
+
+    it('should return empty array on network error', async () => {
+      mockApi.onGet('/favorite').networkError();
+
+      const thunk = fetchFavorites();
+      const result = await thunk(dispatch, () => ({}), axios);
+
+      expect(result.payload).toEqual([]);
+      expect(dispatch).toHaveBeenCalledWith(
+        setServerError('Сервер недоступен')
       );
+    });
+  });
 
-      dispatch(setServerError(null));
-      return data;
+  describe('changeFavoriteStatus', () => {
+    it('should return updated offer on success', async () => {
+      mockApi.onPost('/favorite/1/1').reply(200, mockFavorite);
 
-    } catch (err) {
-      const error = err as AxiosError;
+      const thunk = changeFavoriteStatus({ offerId: '1', status: 1 });
+      const result = await thunk(dispatch, () => ({}), axios);
 
-      if (!error.response) {
-        dispatch(setServerError('Сервер недоступен'));
-      }
+      expect(result.payload).toEqual(mockFavorite);
+      expect(dispatch).toHaveBeenCalledWith(setServerError(null));
+    });
 
-      return [];
-    }
-  }
-);
+    it('should return null on network error', async () => {
+      mockApi.onPost('/favorite/1/1').networkError();
 
-export const changeFavoriteStatus = createAsyncThunk<
-  OfferPreviewType | null,
-  { offerId: string; status: 0 | 1 },
-  { extra: AxiosInstance }
->(
-  'favorite/changeStatus',
-  async ({ offerId, status }, { dispatch, extra: api }) => {
-    try {
-      const { data } = await api.post<OfferPreviewType>(
-        `/favorite/${offerId}/${status}`,
-        {},
-        { headers: tokenService.getAuthHeaders() }
+      const thunk = changeFavoriteStatus({ offerId: '1', status: 1 });
+      const result = await thunk(dispatch, () => ({}), axios);
+
+      expect(result.payload).toBeNull();
+      expect(dispatch).toHaveBeenCalledWith(
+        setServerError('Сервер недоступен')
       );
-
-      dispatch(setServerError(null));
-      return data;
-
-    } catch (err) {
-      const error = err as AxiosError;
-
-      if (!error.response) {
-        dispatch(setServerError('Сервер недоступен'));
-      }
-
-      return null;
-    }
-  }
-);
+    });
+  });
+});
