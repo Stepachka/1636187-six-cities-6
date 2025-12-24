@@ -1,49 +1,87 @@
-import { createReducer, PayloadAction } from '@reduxjs/toolkit';
-
-import { OfferPreviewType } from '../../../types/offer-preview';
+import { favoritesReducer, FavoritesState } from '../reducer';
 import { fetchFavorites, changeFavoriteStatus } from '../action';
+import { OfferPreviewType } from '../../../types/offer-preview';
 
+const mockFavorite: OfferPreviewType = {
+  id: '1',
+  isFavorite: true,
+  city: { name: 'Paris' },
+} as OfferPreviewType;
 
-export interface FavoritesState {
-  favorites: OfferPreviewType[];
-  isFavoritesLoading: boolean;
-}
+describe('favoritesReducer', () => {
+  const initialState: FavoritesState = {
+    favorites: [],
+    isFavoritesLoading: false,
+  };
 
-const initialState: FavoritesState = {
-  favorites: [],
-  isFavoritesLoading: false,
-};
+  it('should return initial state', () => {
+    expect(favoritesReducer(undefined, { type: 'UNKNOWN' }))
+      .toEqual(initialState);
+  });
 
-export const favoritesReducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(fetchFavorites.pending, (state) => {
-      state.isFavoritesLoading = true;
-    })
-    .addCase(fetchFavorites.fulfilled, (state, action: PayloadAction<OfferPreviewType[]>) => {
-      state.favorites = action.payload;
-      state.isFavoritesLoading = false;
-    })
-    .addCase(fetchFavorites.rejected, (state) => {
-      state.favorites = [];
-      state.isFavoritesLoading = false;
-    })
-    .addCase(changeFavoriteStatus.fulfilled, (state, action: PayloadAction<OfferPreviewType | null>) => {
+  it('should set loading on fetchFavorites.pending', () => {
+    const state = favoritesReducer(
+      initialState,
+      fetchFavorites.pending('', undefined)
+    );
 
-      if (!action.payload) {
-        return;
-      }
+    expect(state.isFavoritesLoading).toBe(true);
+  });
 
-      const updated = action.payload;
+  it('should set favorites on fetchFavorites.fulfilled', () => {
+    const state = favoritesReducer(
+      initialState,
+      fetchFavorites.fulfilled([mockFavorite], '', undefined)
+    );
 
-      if (updated.isFavorite) {
-        const exists = state.favorites.some((offer) => offer.id === updated.id);
+    expect(state.favorites).toEqual([mockFavorite]);
+    expect(state.isFavoritesLoading).toBe(false);
+  });
 
-        if (!exists) {
-          state.favorites.push(updated);
-        }
+  it('should reset favorites on fetchFavorites.rejected', () => {
+    const state = favoritesReducer(
+      { ...initialState, favorites: [mockFavorite] },
+      fetchFavorites.rejected(null, '', undefined)
+    );
 
-      } else {
-        state.favorites = state.favorites.filter((offer) => offer.id !== updated.id);
-      }
-    });
+    expect(state.favorites).toEqual([]);
+    expect(state.isFavoritesLoading).toBe(false);
+  });
+
+  it('should add favorite if isFavorite = true', () => {
+    const state = favoritesReducer(
+      initialState,
+      changeFavoriteStatus.fulfilled(mockFavorite, '', {
+        offerId: '1',
+        status: 1,
+      })
+    );
+
+    expect(state.favorites).toEqual([mockFavorite]);
+  });
+
+  it('should remove favorite if isFavorite = false', () => {
+    const state = favoritesReducer(
+      { ...initialState, favorites: [mockFavorite] },
+      changeFavoriteStatus.fulfilled(
+        { ...mockFavorite, isFavorite: false },
+        '',
+        { offerId: '1', status: 0 }
+      )
+    );
+
+    expect(state.favorites).toEqual([]);
+  });
+
+  it('should ignore null payload', () => {
+    const state = favoritesReducer(
+      initialState,
+      changeFavoriteStatus.fulfilled(null, '', {
+        offerId: '1',
+        status: 0,
+      })
+    );
+
+    expect(state).toEqual(initialState);
+  });
 });

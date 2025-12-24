@@ -1,121 +1,77 @@
-import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { AxiosInstance, AxiosError } from 'axios';
-
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { setUserInfo, setAuthorizationStatus, logoutUser, fetchCheckAuth, fetchLogin, fetchLogout } from '../action';
 import { AuthorizationStatus } from '../../../const';
-import { tokenService } from '../../../services/token';
 import { LoginData } from '../../../types/login';
 import { UserAuthType } from '../../../types/user-auth';
-import { setServerError } from '../../error/action';
+import { tokenService } from '../../../services/token';
 
+const mockApi = new MockAdapter(axios);
+const dispatch = vi.fn();
+const getState = vi.fn();
 
-export const setUserInfo = createAction<UserAuthType | null>('user/setUserInfo');
+const mockUser: UserAuthType = {
+  email: 'test@example.com',
+  name: 'Alice',
+  avatarUrl: '/avatar.png',
+  isPro: true,
+  token: 'token123',
+};
 
-export const setAuthorizationStatus = createAction<AuthorizationStatus>('user/setAuthorizationStatus');
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockApi.reset();
 
-export const logoutUser = createAction('user/logout');
+  vi.spyOn(tokenService, 'get').mockReturnValue('token123');
+  vi.spyOn(tokenService, 'remove').mockImplementation((() => {}) as typeof tokenService.remove);
+  vi.spyOn(tokenService, 'getAuthHeaders').mockReturnValue({ Authorization: 'Bearer token123' });
+});
 
-export const fetchCheckAuth = createAsyncThunk<void, undefined, { extra: AxiosInstance }>(
-  'user/checkAuth',
-  async (_arg, { dispatch, extra: api }) => {
+describe('user actions', () => {
+  it('setUserInfo creates correct action', () => {
+    const action = setUserInfo(mockUser);
+    expect(action.payload).toEqual(mockUser);
+  });
 
-    try {
-      const headers = tokenService.getAuthHeaders();
-      const token = tokenService.get();
+  it('setAuthorizationStatus creates correct action', () => {
+    const action = setAuthorizationStatus(AuthorizationStatus.Auth);
+    expect(action.payload).toBe(AuthorizationStatus.Auth);
+  });
 
-      if (!token) {
-        dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-        return;
-      }
+  it('logoutUser creates correct action', () => {
+    const action = logoutUser();
+    expect(action.type).toBe('user/logout');
+  });
+});
 
-      const { data, status } = await api.get<UserAuthType>('/login', { headers });
+describe('user async thunks', () => {
+  it('fetchCheckAuth dispatches Auth when token exists and API returns 200', async () => {
+    mockApi.onGet('/login').reply(200, mockUser);
 
-      if (status === 200) {
-        dispatch(setServerError(null));
-        dispatch(setAuthorizationStatus(AuthorizationStatus.Auth));
-        dispatch(setUserInfo(data));
-      }
+    await fetchCheckAuth()(dispatch, getState, axios);
 
-    } catch (err) {
+    expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'error/setServerError', payload: null }));
+    expect(dispatch).toHaveBeenCalledWith(setAuthorizationStatus(AuthorizationStatus.Auth));
+    expect(dispatch).toHaveBeenCalledWith(setUserInfo(mockUser));
+  });
 
-      const error = err as AxiosError;
+  it('fetchLogin dispatches Auth on success', async () => {
+    const loginData: LoginData = { email: 'test@example.com', password: '123' };
+    mockApi.onPost('/login').reply(200, mockUser);
 
-      if (error.response?.status === 401) {
-        dispatch(setServerError(null));
-        dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-        return;
-      }
+    await fetchLogin(loginData)(dispatch, getState, axios);
 
-      if (!error.response) {
-        dispatch(setServerError('Сервер недоступен'));
-      }
+    expect(dispatch).toHaveBeenCalledWith(setAuthorizationStatus(AuthorizationStatus.Auth));
+    expect(dispatch).toHaveBeenCalledWith(setUserInfo(mockUser));
+  });
 
-      dispatch(setAuthorizationStatus(AuthorizationStatus.Unknown));
-    }
-  }
-);
+  it('fetchLogout clears token and sets NoAuth', async () => {
+    mockApi.onDelete('/logout').reply(204);
 
-export const fetchLogin = createAsyncThunk<void, LoginData, { extra: AxiosInstance }>(
-  'user/login',
-  async ({ email, password }, { dispatch, extra: api }) => {
-    try {
-      const { data, status } = await api.post<UserAuthType>('/login', { email, password });
+    await fetchLogout()(dispatch, getState, axios);
 
-      if (status === 200 || status === 201) {
-        dispatch(setServerError(null));
-        tokenService.set(data.token);
-        dispatch(setAuthorizationStatus(AuthorizationStatus.Auth));
-        dispatch(setUserInfo(data));
-      }
-    } catch (err) {
-      const error = err as AxiosError;
-
-      if (error.response?.status === 400) {
-        dispatch(setServerError(null));
-        dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-      }
-
-      if (!error.response) {
-        dispatch(setServerError('Сервер недоступен'));
-      }
-
-      dispatch(setAuthorizationStatus(AuthorizationStatus.Unknown));
-    }
-  }
-);
-
-export const fetchLogout = createAsyncThunk<void, void, { extra: AxiosInstance }>(
-  'user/logout',
-  async (_arg, { dispatch, extra: api }) => {
-    const token = tokenService.get();
-
-    if (!token) {
-      dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-      dispatch(setUserInfo(null));
-      return;
-    }
-
-    try {
-      const { status } = await api.delete('/logout', {
-        headers: tokenService.getAuthHeaders(),
-      });
-
-      if (status === 204) {
-        dispatch(setServerError(null));
-        tokenService.remove();
-        dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-        dispatch(setUserInfo(null));
-      }
-    } catch (err) {
-      const error = err as AxiosError;
-
-      if (!error.response) {
-        dispatch(setServerError('Сервер недоступен'));
-      }
-
-      dispatch(setServerError(null));
-      tokenService.remove();
-      dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
-      dispatch(setUserInfo(null));
-    }
-  }
-);
+    expect(tokenService.remove).toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith(setAuthorizationStatus(AuthorizationStatus.NoAuth));
+    expect(dispatch).toHaveBeenCalledWith(setUserInfo(null));
+  });
+});
